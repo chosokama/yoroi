@@ -1,0 +1,671 @@
+openapi: 3.1.0
+info:
+  title: AgentWall API
+  version: 0.1.0
+  description: |
+    AgentWall is a production-grade security firewall protocol for AI agents.
+    It evaluates every agent action against policy rules, a risk engine, and source provenance
+    before deciding whether to allow, deny, require confirmation, or sandbox the action.
+  contact:
+    name: AgentWall
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://your-deployment.vercel.app
+    description: Vercel production
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Your AgentWall API key (prefix `aw_`). Obtain from the dashboard.
+
+  schemas:
+    # ─── Enums ────────────────────────────────────────────────────────────────
+    DecisionType:
+      type: string
+      enum: [allow, deny, require_confirmation, sandbox]
+      description: |
+        - `allow`: Action is safe to execute
+        - `deny`: Action is blocked (risk too high or policy violation)
+        - `require_confirmation`: Action needs explicit user confirmation before execution
+        - `sandbox`: Execute in an isolated sandbox environment
+
+    SourceType:
+      type: string
+      enum: [system, developer, user, memory, tool, web, external]
+      description: Origin of the request. Lower-trust sources increase risk score.
+
+    RiskLevel:
+      type: string
+      enum: [low, medium, high, critical]
+
+    # ─── Check ────────────────────────────────────────────────────────────────
+    CheckRequest:
+      type: object
+      required: [agent_id, action, tool]
+      properties:
+        agent_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: Unique identifier of the AI agent
+          example: agent-001
+        action:
+          type: string
+          minLength: 1
+          maxLength: 256
+          description: The action the agent wants to perform
+          example: transfer
+        tool:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: The tool the agent wants to invoke
+          example: solana_wallet
+        args:
+          type: object
+          additionalProperties: true
+          description: Arguments for the action (key-value pairs)
+          example:
+            amount: 100
+            to: "0xabc123"
+        source:
+          $ref: "#/components/schemas/SourceType"
+          default: external
+        user_intent:
+          type: string
+          maxLength: 1024
+          description: High-level description of what the user asked for (used for intent mismatch detection)
+          example: "Send 100 SOL to Alice"
+
+    CheckResponse:
+      type: object
+      required: [decision, risk_score, reason]
+      properties:
+        decision:
+          $ref: "#/components/schemas/DecisionType"
+        risk_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Computed risk score between 0 (safe) and 1 (dangerous)
+          example: 0.72
+        reason:
+          type: string
+          description: Human-readable explanation of the decision
+          example: "Action involves financial transfer and tool is not registered"
+        action_id:
+          type: string
+          format: uuid
+          description: Unique ID of the logged action for audit trail correlation
+
+    # ─── Policy ───────────────────────────────────────────────────────────────
+    Policy:
+      type: object
+      required: [id, org_id, allowed_tools, blocked_actions, trusted_domains, sensitive_actions, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        allowed_tools:
+          type: array
+          items:
+            type: string
+          description: Whitelist of permitted tool IDs. Empty array = all tools allowed.
+          example: ["browser", "search", "calendar"]
+        blocked_actions:
+          type: array
+          items:
+            type: string
+          description: Actions that are always denied regardless of risk score.
+          example: ["delete_account", "drop_table"]
+        trusted_domains:
+          type: array
+          items:
+            type: string
+          description: Domains that receive full trust. Requests to other domains raise risk score.
+          example: ["github.com", "docs.company.com"]
+        max_spend_usd:
+          type: number
+          nullable: true
+          description: Maximum allowed transaction value in USD. null = no limit.
+          example: 500
+        sensitive_actions:
+          type: array
+          items:
+            type: string
+          description: Actions requiring elevated scrutiny (not blocked, but risk is elevated).
+          example: ["payment", "transfer"]
+        risk_threshold_allow:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Risk scores below this threshold result in 'allow'
+          default: 0.3
+        risk_threshold_sandbox:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Risk scores between threshold_allow and this result in 'require_confirmation'
+          default: 0.6
+        risk_threshold_deny:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Risk scores above this threshold result in 'deny'
+          default: 0.8
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreatePolicyRequest:
+      type: object
+      properties:
+        allowed_tools:
+          type: array
+          items:
+            type: string
+        blocked_actions:
+          type: array
+          items:
+            type: string
+        trusted_domains:
+          type: array
+          items:
+            type: string
+        max_spend_usd:
+          type: number
+          nullable: true
+        sensitive_actions:
+          type: array
+          items:
+            type: string
+        risk_threshold_allow:
+          type: number
+          minimum: 0
+          maximum: 1
+        risk_threshold_sandbox:
+          type: number
+          minimum: 0
+          maximum: 1
+        risk_threshold_deny:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    # ─── Tool ─────────────────────────────────────────────────────────────────
+    Tool:
+      type: object
+      required: [tool_id, publisher, permissions, risk_level, created_at]
+      properties:
+        tool_id:
+          type: string
+          description: Unique tool identifier
+          example: solana_wallet
+        publisher:
+          type: string
+          description: Publisher or owner of the tool
+          example: acme-corp
+        permissions:
+          type: array
+          items:
+            type: string
+          example: ["sign_transaction", "transfer"]
+        risk_level:
+          $ref: "#/components/schemas/RiskLevel"
+        schema_hash:
+          type: string
+          nullable: true
+          description: SHA-256 hash of the tool's JSON schema for integrity verification
+        description:
+          type: string
+          nullable: true
+          maxLength: 1024
+        created_at:
+          type: string
+          format: date-time
+
+    RegisterToolRequest:
+      type: object
+      required: [tool_id, publisher]
+      properties:
+        tool_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+          example: solana_wallet
+        publisher:
+          type: string
+          minLength: 1
+          maxLength: 256
+          example: acme-corp
+        permissions:
+          type: array
+          items:
+            type: string
+        risk_level:
+          $ref: "#/components/schemas/RiskLevel"
+        schema_hash:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+          maxLength: 1024
+
+    # ─── Action Log ───────────────────────────────────────────────────────────
+    ActionLog:
+      type: object
+      required: [action_id, agent_id, tool, action, args, risk_score, decision, reason, source, timestamp]
+      properties:
+        action_id:
+          type: string
+          format: uuid
+        agent_id:
+          type: string
+        tool:
+          type: string
+        action:
+          type: string
+        args:
+          type: object
+          additionalProperties: true
+        risk_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        decision:
+          $ref: "#/components/schemas/DecisionType"
+        reason:
+          type: string
+        source:
+          $ref: "#/components/schemas/SourceType"
+        org_id:
+          type: string
+          format: uuid
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+
+    # ─── Errors ───────────────────────────────────────────────────────────────
+    ErrorResponse:
+      type: object
+      required: [error, code]
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+        code:
+          type: string
+          description: Machine-readable error code
+          example: UNAUTHORIZED
+        details:
+          description: Additional error context (validation errors, etc.)
+
+paths:
+  # ─── Core Firewall Endpoint ────────────────────────────────────────────────
+  /api/agentwall/check:
+    post:
+      operationId: checkAction
+      summary: Evaluate an agent action
+      description: |
+        The core AgentWall endpoint. Evaluates an agent action against:
+        1. **Policy Engine** — deterministic rules (tool allowlist, blocked actions, domain trust, spend limits)
+        2. **Risk Engine** — weighted scoring (payment risk, unknown tool, sensitive args, intent mismatch, source provenance)
+
+        Returns a `decision` with a `risk_score` and human-readable `reason`.
+        Every request is logged for auditing.
+      tags: [Firewall]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckRequest"
+            examples:
+              payment:
+                summary: Payment transfer (high risk)
+                value:
+                  agent_id: "agent-001"
+                  action: "transfer"
+                  tool: "solana_wallet"
+                  args:
+                    amount: 500
+                    to: "0xabc123"
+                  source: "user"
+                  user_intent: "Send 500 SOL"
+              search:
+                summary: Web search (low risk)
+                value:
+                  agent_id: "agent-002"
+                  action: "search"
+                  tool: "browser"
+                  args:
+                    query: "latest AI news"
+                  source: "user"
+                  user_intent: "Find AI news"
+      responses:
+        "200":
+          description: Decision returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckResponse"
+              examples:
+                allowed:
+                  summary: Action allowed
+                  value:
+                    decision: allow
+                    risk_score: 0.12
+                    reason: "All policy checks passed"
+                    action_id: "550e8400-e29b-41d4-a716-446655440000"
+                denied:
+                  summary: Action denied
+                  value:
+                    decision: deny
+                    risk_score: 0.91
+                    reason: "Action involves financial transfer and tool is not registered"
+                    action_id: "550e8400-e29b-41d4-a716-446655440001"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded (100 req/min per agent)
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds until the rate limit resets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Policy ────────────────────────────────────────────────────────────────
+  /api/policy:
+    get:
+      operationId: getPolicy
+      summary: Get the active security policy
+      description: Returns the current policy for your organization.
+      tags: [Policy]
+      responses:
+        "200":
+          description: Policy retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    oneOf:
+                      - $ref: "#/components/schemas/Policy"
+                      - type: "null"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      operationId: upsertPolicy
+      summary: Create or update security policy
+      description: |
+        Creates a new policy or updates the existing one for your organization.
+        Invalidates the Redis policy cache immediately.
+      tags: [Policy]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePolicyRequest"
+      responses:
+        "200":
+          description: Policy updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    $ref: "#/components/schemas/Policy"
+        "201":
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  policy:
+                    $ref: "#/components/schemas/Policy"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      operationId: deletePolicy
+      summary: Delete the active policy
+      description: Removes the policy. The default permissive policy becomes active.
+      tags: [Policy]
+      responses:
+        "200":
+          description: Policy deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Tools ─────────────────────────────────────────────────────────────────
+  /api/tools:
+    get:
+      operationId: listTools
+      summary: List registered tools
+      description: Returns all tools in the tool registry.
+      tags: [Tools]
+      responses:
+        "200":
+          description: Tool list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tools:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Tool"
+                  total:
+                    type: integer
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/tools/register:
+    post:
+      operationId: registerTool
+      summary: Register a tool
+      description: |
+        Registers a new tool or updates an existing one (upsert by `tool_id`).
+        Registered tools have their configured `risk_level` used instead of the unknown-tool penalty (+0.20 risk).
+      tags: [Tools]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterToolRequest"
+            example:
+              tool_id: solana_wallet
+              publisher: acme-corp
+              risk_level: high
+              permissions: [sign_transaction, transfer, balance_check]
+              description: Solana blockchain wallet for token transfers
+      responses:
+        "200":
+          description: Tool updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tool:
+                    $ref: "#/components/schemas/Tool"
+                  created:
+                    type: boolean
+        "201":
+          description: Tool registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tool:
+                    $ref: "#/components/schemas/Tool"
+                  created:
+                    type: boolean
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Logs ──────────────────────────────────────────────────────────────────
+  /api/logs:
+    get:
+      operationId: getLogs
+      summary: Get action logs
+      description: Returns paginated audit logs of all agent actions evaluated by AgentWall.
+      tags: [Logs]
+      parameters:
+        - name: agent_id
+          in: query
+          schema:
+            type: string
+          description: Filter by agent ID
+        - name: decision
+          in: query
+          schema:
+            $ref: "#/components/schemas/DecisionType"
+          description: Filter by decision type
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Filter logs after this timestamp (ISO 8601)
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Filter logs before this timestamp (ISO 8601)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Maximum number of results
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Pagination offset
+      responses:
+        "200":
+          description: Log results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ActionLog"
+                  total:
+                    type: integer
+                    description: Total count of matching records
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+tags:
+  - name: Firewall
+    description: Core security evaluation endpoint
+  - name: Policy
+    description: Security policy management
+  - name: Tools
+    description: Tool registry management
+  - name: Logs
+    description: Audit log access
