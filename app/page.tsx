@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GridCanvas } from "@/components/ui/GridCanvas";
+import { Navbar } from "@/components/landing/Navbar";
 
 const FEATURES = [
   {
@@ -54,37 +55,13 @@ export default function LandingPage() {
     <div className="bg-black text-white min-h-screen font-sans overflow-x-hidden">
 
       {/* ── Nav ─────────────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#1a1a1a] bg-black/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="size-7 rounded-lg bg-[#FFC400] flex items-center justify-center">
-              <span className="text-black text-[12px] font-black font-display">鎧</span>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-sm font-black tracking-widest font-display text-white">YOROI</span>
-              <span className="text-[10px] text-[#555] tracking-widest font-display">鎧</span>
-            </div>
-          </div>
-          <div className="hidden md:flex items-center gap-7 text-[13px] text-[#666]">
-            <Link href="/docs" className="hover:text-white transition-colors">Docs</Link>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>
-            <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/docs"
-              className="hidden md:block text-[13px] text-[#888] hover:text-white transition-colors font-medium px-3 py-1.5">
-              Docs
-            </Link>
-            <Link href="/dashboard"
-              className="bg-[#FFC400] text-black text-[13px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-lg hover:bg-[#e6b000] transition-colors font-display">
-              Try Demo
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
+
+      {/* ── Nav spacer ───────────────────────────────────────────────────────── */}
+      <div className="h-[80px]" />
 
       {/* ── Hero ────────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-14 overflow-hidden">
+      <section className="relative min-h-[calc(100vh-80px)] flex flex-col items-center justify-center overflow-hidden">
         <GridCanvas />
 
         {/* Kanji watermark */}
@@ -93,11 +70,6 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 border border-[#FFC400]/30 bg-[#FFC400]/8 rounded-full px-4 py-1.5 mb-8">
-            <span className="size-1.5 rounded-full bg-[#FFC400] animate-pulse" />
-            <span className="text-[11px] font-bold tracking-[0.2em] text-[#FFC400] uppercase font-display">AI Agent Security Firewall</span>
-          </div>
 
           {/* Headline */}
           <h1 className="font-display font-black text-white leading-[0.92] uppercase mb-6">
@@ -292,21 +264,35 @@ if (result.decision === "allow") {
       </section>
 
       {/* ── Footer ──────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-[#1a1a1a] py-10 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="size-6 rounded-md bg-[#FFC400] flex items-center justify-center">
-              <span className="text-black text-[11px] font-black font-display">鎧</span>
-            </div>
-            <span className="text-sm font-black tracking-widest font-display text-white">YOROI</span>
-            <span className="text-[#333] text-sm">鎧 — AI Agent Security Firewall</span>
+      <footer className="border-t border-[#111] bg-black py-14">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+
+          {/* Brand */}
+          <Link href="/" className="inline-block text-[18px] font-black tracking-[0.2em] font-display text-white hover:text-[#FFC400] transition-colors uppercase">
+            YOROI
+          </Link>
+
+          {/* Separator */}
+          <p className="mt-3 text-[#FFC400]/60 font-display text-lg leading-none" aria-hidden="true">鎧</p>
+
+          {/* Primary link + nav */}
+          <div className="mt-2 space-y-1">
+            <Link href="/dashboard" className="block text-[14px] font-medium text-[#666] hover:text-white transition-colors lowercase tracking-wide">
+              dashboard
+            </Link>
+            <p className="text-[11px] text-[#333] font-sans">
+              <Link href="/docs" className="text-[#444] hover:text-[#FFC400] transition-colors">Docs</Link>
+              <span className="mx-2 text-[#222]">·</span>
+              <Link href="/dashboard" className="text-[#444] hover:text-[#FFC400] transition-colors">Dashboard</Link>
+              <span className="mx-2 text-[#222]">·</span>
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="text-[#444] hover:text-[#FFC400] transition-colors">GitHub</a>
+            </p>
           </div>
-          <div className="flex items-center gap-6 text-[13px] text-[#555]">
-            <Link href="/docs" className="hover:text-[#FFC400] transition-colors">Docs</Link>
-            <Link href="/dashboard" className="hover:text-[#FFC400] transition-colors">Dashboard</Link>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-[#FFC400] transition-colors">GitHub</a>
-            <span className="text-[#333]">v0.1.0</span>
-          </div>
+
+          {/* Copyright */}
+          <p className="mt-8 text-[12px] text-[#333] font-sans">
+            © {new Date().getFullYear()}
+          </p>
         </div>
       </footer>
 
