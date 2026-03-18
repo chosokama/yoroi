@@ -74,13 +74,13 @@ export default function LandingPage() {
     let idCounter = 0;
     const interval = setInterval(() => {
       const isBlock = Math.random() > 0.7; // 30% blocks
-      const newLog = {
+      const newLog: { id: number; agent: string; tool: string; action: string; time: string; status: "ALLOW" | "BLOCK" | "SANDBOX" } = {
         id: idCounter++,
-        agent: agents[Math.floor(Math.random() * agents.length)],
-        tool: tools[Math.floor(Math.random() * tools.length)],
-        action: sysActions[Math.floor(Math.random() * sysActions.length)],
+        agent: agents[Math.floor(Math.random() * agents.length)] ?? agents[0]!,
+        tool: tools[Math.floor(Math.random() * tools.length)] ?? tools[0]!,
+        action: sysActions[Math.floor(Math.random() * sysActions.length)] ?? sysActions[0]!,
         time: new Date().toISOString().substring(11, 23),
-        status: isBlock ? "BLOCK" : (Math.random() > 0.9 ? "SANDBOX" : "ALLOW") as any
+        status: isBlock ? "BLOCK" : (Math.random() > 0.9 ? "SANDBOX" : "ALLOW"),
       };
 
       setLogs(prev => [newLog, ...prev].slice(0, 7)); // keep last 7

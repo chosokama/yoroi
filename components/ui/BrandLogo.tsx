@@ -22,11 +22,7 @@ export function BrandLogo({
 
   const content =
     variant === "full" ? (
-      <span
-        className="inline-flex flex-col items-center min-w-0"
-        style={{ gap: withTagline ? "2px" : "0" }}
-      >
-        {/* Logo image -horizontal, fixed height, auto width */}
+      <span className="inline-flex items-center gap-2 min-w-0 whitespace-nowrap">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.png"
@@ -40,11 +36,14 @@ export function BrandLogo({
           }}
         />
         {withTagline && (
-          <span
-            style={{ fontSize: "10px", letterSpacing: "0.08em" }}
-            className="text-[#666] font-mono uppercase"
-          >
-            AI Agent Security Firewall
+          <span className="inline-flex items-center gap-2 ml-1 truncate">
+            <span className="text-[#444] font-normal tracking-normal">|</span>
+            <span
+              style={{ fontSize: "10px", letterSpacing: "0.08em" }}
+              className="text-[#666] font-mono uppercase truncate"
+            >
+              AI Agent Security Firewall
+            </span>
           </span>
         )}
       </span>

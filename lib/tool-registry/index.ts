@@ -79,6 +79,9 @@ export async function registerTool(
 
   const { data, error } = await supabase
     .from("tools")
+    // Supabase types are ungenerated in this repo; query-builder generics infer `never`.
+    // We still validate shape at runtime via Zod schemas and TS casts below.
+    // @ts-expect-error untyped Supabase schema
     .upsert(
       { ...tool, created_at: isNew ? new Date().toISOString() : undefined },
       { onConflict: "tool_id" }

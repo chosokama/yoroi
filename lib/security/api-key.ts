@@ -37,10 +37,14 @@ export async function validateApiKey(
 
   if (error || !data) return null;
 
+  // Supabase client typing for this repo is intentionally lightweight (no generated DB types).
+  // Cast the row into the shape we query.
+  const row = data as unknown as { org_id: string; id: string; label: string };
+
   return {
-    orgId: data.org_id as string,
-    keyId: data.id as string,
-    label: data.label as string,
+    orgId: row.org_id,
+    keyId: row.id,
+    label: row.label,
   };
 }
 
