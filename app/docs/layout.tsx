@@ -13,7 +13,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <div className="ml-auto flex items-center gap-1">
             <Link href="/" className="px-3 py-1 text-[12px] text-[#444] hover:text-white transition-colors font-sans">Home</Link>
             <Link href="/dashboard" className="px-3 py-1 text-[12px] text-[#444] hover:text-white transition-colors font-sans">Dashboard</Link>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="px-3 py-1 text-[12px] text-[#444] hover:text-white transition-colors font-sans">GitHub ↗</a>
+            <a href="https://github.com/moltwall" target="_blank" rel="noreferrer" className="px-3 py-1 text-[12px] text-[#444] hover:text-white transition-colors font-sans">X ↗</a>
           </div>
         </div>
       </nav>

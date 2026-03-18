@@ -412,7 +412,7 @@ if (result.decision === "allow") {
             <span>·</span>
             <Link href="/dashboard" className="hover:text-[#FFC400] transition-colors">Dashboard</Link>
             <span>·</span>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-[#FFC400] transition-colors">GitHub</a>
+            <a href="https://github.com/moltwall" target="_blank" rel="noreferrer" className="hover:text-[#FFC400] transition-colors">X</a>
           </div>
           <p className="pt-2 text-[12px] text-[#333] font-sans">
             © {new Date().getFullYear()} · www.moltwall.xyz

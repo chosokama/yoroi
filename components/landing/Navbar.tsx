@@ -7,7 +7,7 @@ import { BrandLogo } from "@/components/ui/BrandLogo";
 const NAV_ITEMS = [
   { label: "Docs", href: "/docs", kanji: "書" },
   { label: "Dashboard", href: "/dashboard", kanji: "監" },
-  { label: "GitHub", href: "https://github.com", kanji: "源", external: true },
+  { label: "X", href: "https://github.com/moltwall", kanji: "X", external: true },
 ];
 
 export function Navbar() {
