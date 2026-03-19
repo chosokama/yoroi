@@ -145,7 +145,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-[#999] text-[clamp(1.1rem,1.5vw,1.25rem)] max-w-2xl leading-relaxed mb-12">
-              <span className="text-white font-bold">MoltWall</span> is a production-grade security firewall for AI agents. Every tool call evaluated, every threat blocked, every decision audited -in under <span className="text-[#FFC400] font-bold">10ms</span>.
+              <span className="text-white font-bold">MoltWall</span> is a production-grade security firewall for AI agents. Every tool call evaluated, every threat blocked, every decision audited - in under <span className="text-[#FFC400] font-bold">10ms</span>.
             </p>
 
             <div className="flex items-center gap-5 flex-wrap">
