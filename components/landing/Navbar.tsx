@@ -8,6 +8,7 @@ import { DashboardButton } from "@/components/auth/DashboardButton";
 const NAV_ITEMS = [
   { label: "Docs", href: "/docs" },
   { label: "Dashboard", href: "/dashboard" },
+  { label: "Roadmap", href: "/roadmap" },
   { label: "GitHub", href: "https://github.com/moltwall/moltwall", external: true },
   { label: "npm", href: "https://www.npmjs.com/package/@moltwall/sdk", external: true },
 ];
@@ -134,7 +135,8 @@ export function Navbar() {
                           <p className="text-[13px] font-bold text-white tracking-wide">{item.label}</p>
                           <p className="text-[11px] text-[#444] font-mono mt-0.5 tracking-wider uppercase">{
                             item.href === "/docs" ? "Documentation & API" :
-                              item.href === "/dashboard" ? "Security Console" : ""
+                              item.href === "/dashboard" ? "Security Console" :
+                              item.href === "/roadmap" ? "What we're building" : ""
                           }</p>
                         </div>
                       </div>
