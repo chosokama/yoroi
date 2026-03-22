@@ -179,7 +179,7 @@ Policies define allowed behavior -evaluated **deterministically** (no LLM).
   "trusted_domains": ["github.com", "docs.company.com"],
   "max_spend_usd": 500,
   "sensitive_actions": ["payment", "transfer"],
-  "risk_threshold_allow": 0.3,
+  "risk_threshold_allow": 0.25,
   "risk_threshold_sandbox": 0.6,
   "risk_threshold_deny": 0.8
 }
