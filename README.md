@@ -37,7 +37,7 @@ Action Log (Supabase) + Cache (Redis)
 
 ## Quick Start
 
-### 1. Install dependencies
+### 1. Install
 
 ```bash
 npm install
