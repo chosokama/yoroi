@@ -61,7 +61,7 @@ Fill in:
 
 ### 3. Run database migration
 
-In your Supabase SQL editor, run:
+In your Supabase SQL editor \(or via CLI\), run:
 
 ```sql
 -- contents of database/migrations/001_initial.sql
