@@ -1,6 +1,6 @@
 # MoltWall
 
-**Production-grade security firewall for AI agents.**
+**Production-grade security firewall for AI agents and agentic workflows.**
 
 > MoltWall — AI agent security firewall.
 
