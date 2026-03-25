@@ -57,7 +57,7 @@ Fill in:
 | `SUPABASE_SERVICE_KEY` | Supabase service role key (never expose client-side) |
 | `UPSTASH_REDIS_URL` | Upstash Redis REST URL |
 | `UPSTASH_REDIS_TOKEN` | Upstash Redis REST token |
-| `MOLTWALL_SECRET` | 32+ character secret for internal token signing |
+| `MOLTWALL_SECRET` | 64+ character secret for HMAC-SHA256 internal token signing |
 
 ### 3. Run database migration
 
