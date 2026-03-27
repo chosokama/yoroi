@@ -93,7 +93,7 @@ Content-Type: application/json
   "action": "transfer",
   "tool": "solana_wallet",
   "args": { "amount": 100, "to": "0xabc..." },
-  "source": "user",
+  "source": "user",  // user | agent | system,
   "user_intent": "Send 100 SOL to Alice"
 }
 ```
