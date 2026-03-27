@@ -4,7 +4,7 @@
 
 > MoltWall — AI agent security firewall.
 
-MoltWall acts as a middleware layer between AI agents and external tools (APIs, wallets, browsers, MCP servers). Every agent action is intercepted and evaluated before execution -returning `allow`, `deny`, `sandbox`, or `require_confirmation` — each with a full risk trace.
+MoltWall operates as a middleware layer between AI agents and external tools (APIs, wallets, browsers, MCP servers). Every agent action is intercepted and evaluated before execution -returning `allow`, `deny`, `sandbox`, or `require_confirmation` — each with a full risk trace.
 
 ## What It Prevents
 
