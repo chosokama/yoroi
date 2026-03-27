@@ -73,7 +73,7 @@ In your Supabase SQL editor \(or via CLI\), run:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) — dashboard available at `/dashboard`
 
 ---
 
