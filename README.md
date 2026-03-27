@@ -2,7 +2,7 @@
 
 **Production-grade security firewall for AI agents and agentic workflows.**
 
-> MoltWall — AI agent security firewall.
+> MoltWall — real-time security firewall for AI agents.
 
 MoltWall operates as a middleware layer between AI agents and external tools (APIs, wallets, browsers, MCP servers). Every agent action is intercepted and evaluated before execution -returning `allow`, `deny`, `sandbox`, or `require_confirmation` — each with a full risk trace.
 
