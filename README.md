@@ -199,7 +199,7 @@ Policies define allowed behavior -evaluated **deterministically** — zero LLM i
   /api/logs               ← Action log query
   /dashboard              ← Admin UI
   /docs                   ← Documentation
-/sdk/typescript           ← MoltWall TypeScript SDK
+/sdk/typescript           ← MoltWall TypeScript SDK (ESM + CJS)
 /lib
   /policy-engine          ← Deterministic evaluators
   /risk-engine            ← Weighted scorers
