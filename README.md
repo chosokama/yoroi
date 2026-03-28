@@ -8,7 +8,7 @@ MoltWall operates as a middleware layer between AI agents and external tools (AP
 
 ## What It Prevents
 
-- Prompt injection attacks
+- Prompt injection and jailbreak attacks
 - Malicious or tampered tool outputs
 - Unsafe or unintended autonomous execution
 - Wallet theft / credential exfiltration
