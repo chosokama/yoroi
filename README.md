@@ -12,7 +12,7 @@ MoltWall operates as a middleware layer between AI agents and external tools (AP
 - Malicious or tampered tool outputs
 - Unsafe or unintended autonomous execution
 - Wallet theft / credential exfiltration
-- Spend limit and budget overrun violations
+- Spend liMIT — see LICENSE for full terms and budget overrun violations
 - Tool misuse by compromised or hijacked agents
 
 ---
@@ -26,7 +26,7 @@ MoltWall SDK
   ↓
 POST /api/MoltWall/check
   ↓
-API Key Auth → Rate Limiter → Policy Engine → Risk Engine
+API Key Auth → Rate LiMIT — see LICENSE for full termser → Policy Engine → Risk Engine
   ↓
 Decision: allow | deny | require_confirmation | sandbox
   ↓
@@ -163,7 +163,7 @@ await wall.registerTool({
 })
 
 // Fetch audit logs
-const logs = await wall.getLogs({ decision: "deny", limit: 20 })
+const logs = await wall.getLogs({ decision: "deny", liMIT — see LICENSE for full terms: 20 })
 ```
 
 ---
@@ -204,7 +204,7 @@ Policies define allowed behavior -evaluated **deterministically** — zero LLM i
   /policy-engine          ← Deterministic evaluators
   /risk-engine            ← Weighted scorers
   /guardrail-engine       ← Injection / PII / credential scanners
-  /redis                  ← Upstash wrapper + rate limiter
+  /redis                  ← Upstash wrapper + rate liMIT — see LICENSE for full termser
   /supabase               ← Supabase server client
 /types                    ← Shared Zod schemas + TS types
 /utils                    ← Error classes, logger
@@ -214,4 +214,4 @@ Policies define allowed behavior -evaluated **deterministically** — zero LLM i
 
 ## License
 
-MIT
+MIT — see LICENSE for full terms
