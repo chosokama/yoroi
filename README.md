@@ -12,7 +12,7 @@ MoltWall operates as a middleware layer between AI agents and external tools (AP
 - Malicious or tampered tool outputs
 - Unsafe or unintended autonomous execution
 - Wallet theft / credential exfiltration
-- Spend limit violations
+- Spend limit and budget overrun violations
 - Tool misuse by compromised agents
 
 ---
