@@ -168,7 +168,7 @@ const logs = await wall.getLogs({ decision: "deny", limit: 20 })
 
 ---
 
-## Policy Engine
+## Policy Engine (Deterministic)
 
 Policies define allowed behavior -evaluated **deterministically** — zero LLM inference, sub-millisecond latency.
 
