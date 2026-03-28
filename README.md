@@ -151,7 +151,7 @@ if (result.decision === "require_confirmation") {
   if (!confirmed) return
 }
 
-// Safe to execute
+// Firewall approved — safe to execute
 await executeTransfer(result)
 
 // Register a tool
